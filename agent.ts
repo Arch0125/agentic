@@ -29,6 +29,7 @@ import { bridgeTokens } from "./cctp";
 import { USDC_ADDRESS } from "./constants";
 import cron from "node-cron";
 import { monitorDepositsAndPrice } from "./trend";
+import { scheduleSubscriptionJob } from "./subscribe";
 
 dotenv.config();
 
@@ -165,6 +166,21 @@ const customUSDCTransfer = customActionProvider<CdpWalletProvider>({
   },
 });
 
+const customSubscriptionPrompt = customActionProvider<CdpWalletProvider>({
+    name: "subscription",
+    description: "Subscribe to a service",
+    schema: z.object({
+        address: z.string().describe("The address to subscribe to"),
+        amount: z.number().positive().describe("The amount to pay for the subscription"),
+    }),
+    invoke: async (walletProvider, args: any) => {
+        const { address, amount } = args;
+        const res = await scheduleSubscriptionJob(address, amount);
+        return `You have successfully subscribed to ${address} for ${amount} USDC`;
+    },
+});
+
+
 /**
  * Initialize the agent with CDP AgentKit
  *
@@ -217,6 +233,7 @@ async function initializeAgent() {
         customSignMessage,
         customBridgingToken,
         customUSDCTransfer,
+        customSubscriptionPrompt,
         cdpApiActionProvider({
           apiKeyName: process.env.CDP_API_KEY_NAME,
           apiKeyPrivateKey: process.env.CDP_API_KEY_PRIVATE_KEY?.replace(/\\n/g, "\n"),

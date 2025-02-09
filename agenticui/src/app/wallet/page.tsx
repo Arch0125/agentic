@@ -6,16 +6,27 @@ export default function Dashboard() {
   const username = "User123";
   const balance = 500;
   const [prompt, setPrompt] = useState("");
-  const [transactions, setTransactions] = useState([
-    { receiver: 'Alice', amount: 50 },
-    { receiver: 'Bob', amount: -20 },
-    { receiver: 'Charlie', amount: 100 },
-  ]);
+  const [responses, setResponses] = useState([]);
 
-  const handleSendPrompt = (event) => {
+  const handleSendPrompt = async (event) => {
     event.preventDefault();
-    // Process the prompt as needed. For now, log to the console.
-    console.log("Prompt submitted:", prompt);
+    try {
+      const res = await fetch("http://localhost:3060/prompt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: prompt }),
+      });
+      if (!res.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await res.json();
+      // Expecting data in the format: { response: "some text" }
+      if (data.response) {
+        setResponses((prev) => [...prev, data.response]);
+      }
+    } catch (error) {
+      console.error("Error sending prompt:", error);
+    }
     // Clear the prompt input after submission
     setPrompt("");
   };
@@ -45,30 +56,23 @@ export default function Dashboard() {
             </button>
           </form>
         </div>
-        {/* Bottom section: White background listing transactions */}
+        {/* Bottom section: White background listing responses */}
         <div className="p-6 bg-white">
-          <h3 className="text-xl font-bold mb-4">Transactions</h3>
-          <ul>
-            {transactions.map((tx, index) => (
-              <li
-                key={index}
-                className="flex justify-between items-center border-b border-gray-200 py-2"
-              >
-                <span>{tx.receiver}</span>
-                <span
-                  className={
-                    tx.amount >= 0
-                      ? "text-green-500 font-bold"
-                      : "text-red-500 font-bold"
-                  }
+          <h3 className="text-xl font-bold mb-4">Responses</h3>
+          {responses.length === 0 ? (
+            <p className="text-gray-500">No responses yet.</p>
+          ) : (
+            <ul>
+              {responses.map((resp, index) => (
+                <li
+                  key={index}
+                  className="border-b border-gray-200 py-2 text-gray-800"
                 >
-                  {tx.amount >= 0
-                    ? `+$${tx.amount}`
-                    : `-$${Math.abs(tx.amount)}`}
-                </span>
-              </li>
-            ))}
-          </ul>
+                  {resp}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </div>

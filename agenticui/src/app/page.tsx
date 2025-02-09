@@ -1,13 +1,30 @@
 "use client";
 import { useState } from 'react';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [username, setUsername] = useState('');
+  const router = useRouter();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     console.log('Username submitted:', username);
-    // You can add further processing logic here
+
+    try {
+      // Create the prompt to mint a basename using the provided username
+      const prompt = `mint basename using the name "${username}"`;
+      
+      // Make the POST request to the /prompt endpoint
+      const response = await axios.post('http://localhost:3060/prompt', { prompt });
+      console.log('Transaction successful:', response.data);
+      
+      // Navigate to the wallet page once the transaction is successful
+      router.push('/wallet');
+    } catch (error) {
+      console.error('Error minting basename:', error);
+      // Optionally add error handling or user feedback here
+    }
   };
 
   return (

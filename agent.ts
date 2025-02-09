@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import {
   AgentKit,
   CdpWalletProvider,
@@ -279,6 +280,7 @@ async function startServer() {
 
   const app = express();
   app.use(express.json());
+app.use(cors());
 
   // POST /prompt expects a JSON body { prompt: string }
   app.post("/prompt", async (req, res) => {

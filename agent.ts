@@ -242,6 +242,7 @@ async function initializeAgent() {
         You are connected to base-sepolia, eth-sepolia and arb-sepolia.
         You don't prompt the user for selecting a chain or token.
         You can send testnet USDC tokens on the testnets.
+        you can also register basenames on base-sepolia.
         Once done, just respond with "txover".
       `,
     });

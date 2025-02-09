@@ -31,6 +31,7 @@ import { USDC_ADDRESS } from "./constants";
 import cron from "node-cron";
 import { monitorDepositsAndPrice } from "./trend";
 import { scheduleSubscriptionJob } from "./subscribe";
+import { getCollectiveUSDCBalance } from "./balance";
 
 dotenv.config();
 
@@ -305,6 +306,20 @@ app.use(cors());
       res.status(500).json({ error: error.message });
     }
   });
+
+  app.get("/balance", async (req, res) => {
+    const userAddress = req.query.address as string;
+    if (!userAddress) {
+      return res.status(400).json({ error: "Missing address query parameter" });
+    }
+    try {
+      const balance = await getCollectiveUSDCBalance(userAddress);
+      res.json({ balance: balance.toString() });
+    } catch (error: any) {
+      console.error("Error fetching balance:", error);
+      res.status(500).json({ error: error.message });
+    }
+  })
 
   const port = process.env.PORT || 3060;
   app.listen(port, () => {

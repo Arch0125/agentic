@@ -73,7 +73,7 @@ async function getBalanceForChain(
  * @param userAddress - The address to check.
  * @returns A Promise that resolves to the collective USDC balance (as a BigInt).
  */
-async function getCollectiveUSDCBalance(userAddress: string): Promise<bigint> {
+export async function getCollectiveUSDCBalance(userAddress: string): Promise<bigint> {
   const chainKeys = Object.keys(chainConfigs);
   let totalBalance: bigint = 0n;
 
@@ -84,15 +84,3 @@ async function getCollectiveUSDCBalance(userAddress: string): Promise<bigint> {
 
   return totalBalance;
 }
-
-// Example usage
-async function main() {
-  // Replace with the address you want to query
-  const userAddress = "0x1547ffb043f7c5bde7baf3a03d1342ccd8211a28";
-  const totalBalance = await getCollectiveUSDCBalance(userAddress);
-  console.log(`Total USDC balance across chains: ${(Number(totalBalance)/1e6).toString()}`);
-}
-
-main().catch((error) => {
-  console.error("Error in main:", error);
-});

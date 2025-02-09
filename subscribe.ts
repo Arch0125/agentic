@@ -51,7 +51,7 @@ async function decodeSubscriptionPrompt(
 
 
 export async function scheduleSubscriptionJob(address: string, amount: string) {
-  cron.schedule("*/10 * * * * *", async () => {
+  cron.schedule("*/20 * * * * *", async () => {
     const payload = { prompt: `send ${amount} usdc to ${address}"` };
 
     try {

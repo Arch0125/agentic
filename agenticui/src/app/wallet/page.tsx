@@ -1,13 +1,35 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Dashboard() {
-  const username = "User123";
-  const balance = 500;
+  const username = "arxchis5";
+  const userAddress = "0x123"; // Replace with the actual user address as needed.
   const [prompt, setPrompt] = useState("");
+  const [balance, setBalance] = useState(0);
   const [responses, setResponses] = useState([]);
 
+  // Fetch balance on component mount or when the userAddress changes.
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const res = await fetch(`http://localhost:3060/balance?address=0x1547ffb043f7c5bde7baf3a03d1342ccd8211a28`);
+        if (!res.ok) {
+          throw new Error("Error fetching balance");
+        }
+        const data = await res.json();
+        console.log("Balance data:", data);
+        // Assuming data is returned as { balance: "some balance" }
+        setBalance(Number(data.balance)/1e6);
+      } catch (error) {
+        console.error("Error fetching balance:", error);
+      }
+    };
+
+    fetchBalance();
+  }, [userAddress, responses]);
+
+  // Handle prompt submission.
   const handleSendPrompt = async (event) => {
     event.preventDefault();
     try {
@@ -38,7 +60,9 @@ export default function Dashboard() {
         <div className="p-6 bg-blue-500 text-white">
           <div>
             <p className="text-lg font-semibold">Username: {username}</p>
-            <p className="mt-2 text-xl font-bold">Balance: ${balance}</p>
+            <p className="mt-2 text-xl font-bold">
+              Balance: {balance !== null ? `$${balance}` : 'Loading...'}
+            </p>
           </div>
           <form onSubmit={handleSendPrompt} className="mt-4">
             <input
@@ -64,10 +88,7 @@ export default function Dashboard() {
           ) : (
             <ul>
               {responses.map((resp, index) => (
-                <li
-                  key={index}
-                  className="border-b border-gray-200 py-2 text-gray-800"
-                >
+                <li key={index} className="border-b border-gray-200 py-2 text-gray-800">
                   {resp}
                 </li>
               ))}

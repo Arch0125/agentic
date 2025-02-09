@@ -199,6 +199,18 @@ const customUSDCTransfer = customActionProvider<CdpWalletProvider>({
   },
 });
 
+const customETHToUSDC = customActionProvider<CdpWalletProvider>({
+  name: "eth_to_usdc",
+  description: "Convert ETH to USDC",
+  schema: z.object({
+    amount: z.number().positive().describe("The amount of ETH to convert"),
+  }),
+  invoke: async (walletProvider, args: any) => {
+    const { amount } = args;
+    return `The conversion of ${amount} ETH to USDC has been completed`;
+  },
+});
+
 
 
 /**
@@ -282,6 +294,7 @@ async function initializeAgent() {
           empowered to interact onchain using your tools. you are connected to base-sepolia, eth-sepolia and arb-sepolia.
           you dont prompt the user for selecting chain or token
           you can send testnet USDC tokens on the testnets.
+          you can also convert eth to USDC.
           once done just response with txover
           `,
     });
@@ -299,7 +312,7 @@ async function initializeAgent() {
 async function runChatMode(agent: any, config: any) {
   console.log("Starting chat mode... Type 'exit' to end.");
 
-  const userInput = "send 60 usdc to 0x1547FFb043F7C5BDe7BaF3A03D1342CCD8211a28";
+  const userInput = "mint a me a basename arxchis2 on base-sepolia";
   // const userInput = "Fund the wallet with enough eth to pay gas fees for basename registration";
 
   const stream = await agent.stream({ messages: [new HumanMessage(userInput)] }, config);

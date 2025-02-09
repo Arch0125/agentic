@@ -1,22 +1,16 @@
 import cron from "node-cron";
 import axios from "axios";
 import { createPublicClient, http } from "viem";
-import { mainnet } from "viem/chains";
+import { baseSepolia, mainnet } from "viem/chains";
 
-// --- Viem Provider Setup ---
-// Replace with your own RPC endpoint (e.g., via Alchemy or Infura).
+
 const provider = createPublicClient({
-  chain: mainnet,
-  transport: http("https://eth-mainnet.alchemy.com/v2/YOUR_ALCHEMY_API_KEY"),
+  chain: baseSepolia,
+  transport: http("https://base-sepolia.g.alchemy.com/v2/0fxbpb4OCXkkyHhFNPBRelJsFg7XdhML"),
 });
 
-// --- Global Reference Price ---
-// When ETH is held (and predicted to be “up”), store a reference price to compare for a 0.5% drop.
 let lastEthPrice: number | undefined = undefined;
 
-/**
- * Fetch the current ETH price from CoinGecko.
- */
 async function getCurrentEthPrice(): Promise<number> {
   try {
     const response = await axios.get(
@@ -97,8 +91,8 @@ async function convertToUSDC(): Promise<void> {
   console.log(`[${new Date().toISOString()}] Converting ETH to USDC...`);
 }
 
-async function monitorDepositsAndPrice() {
-  const walletAddress = "YOUR_WALLET_ADDRESS";
+export async function monitorDepositsAndPrice() {
+  const walletAddress = "0x1547ffb043f7c5bde7baf3a03d1342ccd8211a28";
 
   const balance = await provider.getBalance({ address: walletAddress });
   const ethBalance = Number(balance) / 1e18;
@@ -138,27 +132,27 @@ async function monitorDepositsAndPrice() {
   }
 }
 
-// --- Schedule the Cron Job ---
-// This cron schedule ("0 * * * *") runs at the 0th minute of every hour.
-// cron.schedule("0 * * * *", async () => {
-//   console.log(`[${new Date().toISOString()}] Running hourly ETH monitoring check...`);
-//   try {
-//     await monitorDepositsAndPrice();
-//   } catch (error) {
-//     console.error("Error during hourly check:", error);
-//   }
+// // --- Schedule the Cron Job ---
+// // This cron schedule ("0 * * * *") runs at the 0th minute of every hour.
+// // cron.schedule("0 * * * *", async () => {
+// //   console.log(`[${new Date().toISOString()}] Running hourly ETH monitoring check...`);
+// //   try {
+// //     await monitorDepositsAndPrice();
+// //   } catch (error) {
+// //     console.error("Error during hourly check:", error);
+// //   }
+// // });
+
+// getCurrentEthPrice().then(() => {
+//     console.log("Done");
+//     }
+// ).catch((error) => {
+//     console.log(error);
 // });
 
-getCurrentEthPrice().then(() => {
-    console.log("Done");
-    }
-).catch((error) => {
-    console.log(error);
-});
-
-predictEthPrice().then(() => {
-    console.log("Done");
-    }
-).catch((error) => {
-    console.log(error);
-});
+// predictEthPrice().then(() => {
+//     console.log("Done");
+//     }
+// ).catch((error) => {
+//     console.log(error);
+// });

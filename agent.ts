@@ -27,6 +27,8 @@ import { z } from "zod";
 import { processTransferPrompt } from "./bridge";
 import { bridgeTokens } from "./cctp";
 import { USDC_ADDRESS } from "./constants";
+import cron from "node-cron";
+import { monitorDepositsAndPrice } from "./trend";
 
 dotenv.config();
 
@@ -290,9 +292,16 @@ async function startServer() {
   });
 }
 
-/**
- * Main entry point
- */
+cron.schedule("0 * * * *", async () => {
+    console.log(`[${new Date().toISOString()}] Running hourly ETH monitoring cron job...`);
+    try {
+      await monitorDepositsAndPrice();
+    } catch (error) {
+      console.error("Error in ETH monitoring cron job:", error);
+    }
+  });
+
+
 async function main() {
   try {
     await startServer();

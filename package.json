@@ -16,6 +16,7 @@
     "@langchain/openai": "^0.4.2",
     "ethers": "^6.13.5",
     "express": "^4.21.2",
+    "nillion-sv-wrappers": "^1.0.9",
     "node-cron": "^3.0.3",
     "viem": "^2.22.21"
   }

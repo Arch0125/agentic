@@ -28,6 +28,7 @@ import { z } from "zod";
 import { processTransferPrompt } from "./bridge";
 import { bridgeTokens } from "./cctp";
 import { USDC_ADDRESS } from "./constants";
+import { submitToNillion } from "./nillion/post";
 
 dotenv.config();
 
@@ -282,6 +283,7 @@ async function initializeAgent() {
 
     // Store buffered conversation history in memory
     const memory = new MemorySaver();
+    console.log(memory.storage);
     const agentConfig = { configurable: { thread_id: "CDP AgentKit Chatbot Example!" } };
 
     // Create React Agent using the LLM and CDP AgentKit tools
@@ -312,7 +314,7 @@ async function initializeAgent() {
 async function runChatMode(agent: any, config: any) {
   console.log("Starting chat mode... Type 'exit' to end.");
 
-  const userInput = "mint a me a basename arxchis2 on base-sepolia";
+  const userInput = "send 1 usdc to 0x49ae3cc2e3aa768b1e5654f5d3c6002144a59581";
   // const userInput = "Fund the wallet with enough eth to pay gas fees for basename registration";
 
   const stream = await agent.stream({ messages: [new HumanMessage(userInput)] }, config);
@@ -333,6 +335,15 @@ async function main() {
     const { agent, config } = await initializeAgent();
 
     await runChatMode(agent, config);
+
+    const stateData = [
+      {
+        timestamp: new Date().toISOString(),
+        data: JSON.stringify(await agent.getState(config))
+      }
+    ]
+
+    await submitToNillion(stateData);
   } catch (error) {
     if (error instanceof Error) {
       console.error("Error:", error.message);
